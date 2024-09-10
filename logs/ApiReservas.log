@@ -1,0 +1,5 @@
+2024-09-09 23:17:31,615 INFO o.s.b.StartupInfoLogger [main] Starting ApiReservasApplication using Java 17.0.10 with PID 21568 (C:\Users\casco\Desktop\UNI\Septimo\Distri\ApiReservas\target\classes started by casco in C:\Users\casco\Desktop\UNI\Septimo\Distri\ApiReservas)
+2024-09-09 23:17:31,630 DEBUG o.s.b.StartupInfoLogger [main] Running with Spring Boot v3.3.3, Spring v6.1.12
+2024-09-09 23:17:31,631 INFO o.s.b.SpringApplication [main] No active profile set, falling back to 1 default profile: "default"
+2024-09-09 23:17:39,945 INFO o.s.b.StartupInfoLogger [main] Started ApiReservasApplication in 8.806 seconds (process running for 10.211)
+2024-09-09 23:19:43,162 INFO c.a.a.c.MyController [http-nio-8080-exec-3] Esto es un log tipo info.
