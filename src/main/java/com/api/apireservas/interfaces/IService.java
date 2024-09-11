@@ -2,7 +2,6 @@ package com.api.apireservas.interfaces;
 
 import com.api.apireservas.abstracts.AbstractDto;
 import com.api.apireservas.dto.PageResponse;
-import org.springframework.data.domain.PageRequest;
 
 public interface IService<T extends AbstractDto> {
     T create(T dto);

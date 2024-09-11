@@ -1,10 +1,17 @@
 package com.api.apireservas.abstracts;
 
-import com.api.apireservas.interfaces.IEntity;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Data;
 
-@MappedSuperclass
+
 @Data
-public abstract class AbstractEntity implements IEntity {
+@MappedSuperclass
+public abstract class AbstractEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private boolean activo = true;
 }

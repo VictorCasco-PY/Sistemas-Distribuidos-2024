@@ -1,17 +1,13 @@
 package com.api.apireservas.entity;
 
-import com.api.apireservas.entity.base.BaseEntity;
-import com.api.apireservas.interfaces.IEntity;
+import com.api.apireservas.abstracts.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
 @Table(name = "detalle_reserva")
-public class DetalleReservaEntity implements IEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class DetalleReservaEntity extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "reserva_id", nullable = false)

@@ -1,7 +1,6 @@
 package com.api.apireservas.entity;
 
-import com.api.apireservas.entity.base.BaseEntity;
-import com.api.apireservas.interfaces.IEntity;
+import com.api.apireservas.abstracts.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -10,10 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @Table(name = "reservas")
-public class ReservaEntity implements IEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ReservaEntity extends AbstractEntity {
 
     private Long clienteId;  // Relación con cliente podría mejorarse
 

@@ -7,8 +7,5 @@ import jakarta.persistence.Id;
 import java.io.Serializable;
 
 public abstract class AbstractDto implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private boolean activo;
+    private static final long serialVersionUID = 1L;
 }
