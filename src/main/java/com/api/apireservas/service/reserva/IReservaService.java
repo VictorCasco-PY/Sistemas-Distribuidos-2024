@@ -10,4 +10,6 @@ public interface IReservaService {
     void deleteReserva(Long id);
     ReservaDto getReservaById(Long id);
     PageResponse<ReservaDto> getAllReservas(Pageable pageable);
+
+    PageResponse<ReservaDto> getReservasByEstado(String estado, Pageable pageable);
 }

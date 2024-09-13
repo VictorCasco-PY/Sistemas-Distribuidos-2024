@@ -3,6 +3,7 @@ package com.api.apireservas.service.mesa;
 import com.api.apireservas.dto.MesaDto;
 import com.api.apireservas.dto.PageResponse;
 import com.api.apireservas.entity.MesaEntity;
+import com.api.apireservas.exceptions.NotFoundException;
 import com.api.apireservas.repository.MesaRepository;
 import com.api.apireservas.utils.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,22 +44,26 @@ public class MesaServiceImpl implements IMesaService {
     public void deleteMesa(Long id) {
         MesaEntity mesaEntity = mesaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
-        mesaEntity.setActivo(false);  // Borrado lógico usando 'activo'
+        mesaEntity.setActivo(false);
         mesaRepository.save(mesaEntity);
     }
 
-
     @Override
-    //@Cacheable(value = "mesa", key = "'api_mesa ' + #id")
+    //@Cacheable(value = "mesa", key = "'api_mesa_' + #id")
     public MesaDto getMesaById(Long id) {
-        return mesaRepository.findById(id)
-                .map(mesa -> mapper.toDto(mesa, MesaDto.class))
-                .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
+        MesaEntity mesaEntity = mesaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Mesa no encontrada"));
+
+        if (!mesaEntity.isActivo()) {
+            throw new NotFoundException("Mesa no encontrada");
+        }
+
+        return mapper.toDto(mesaEntity, MesaDto.class);
     }
 
     @Override
     public PageResponse<MesaDto> getAllMesas(Pageable pageable) {
-        Page<MesaEntity> page = mesaRepository.findAll(pageable);
+        Page<MesaEntity> page = mesaRepository.findByActivoTrue(pageable);
         List<MesaDto> mesas = page.map(mesa -> mapper.toDto(mesa, MesaDto.class)).getContent();
         return new PageResponse<>(
                 mesas,

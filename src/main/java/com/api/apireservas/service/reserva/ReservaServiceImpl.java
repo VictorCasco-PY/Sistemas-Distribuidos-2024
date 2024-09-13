@@ -3,6 +3,7 @@ package com.api.apireservas.service.reserva;
 import com.api.apireservas.dto.PageResponse;
 import com.api.apireservas.dto.ReservaDto;
 import com.api.apireservas.entity.ReservaEntity;
+import com.api.apireservas.exceptions.NotFoundException;
 import com.api.apireservas.repository.ReservaRepository;
 import com.api.apireservas.utils.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ReservaServiceImpl implements IReservaService {
+
 
     @Autowired
     private ReservaRepository reservaRepository;
@@ -31,42 +32,50 @@ public class ReservaServiceImpl implements IReservaService {
 
     @Override
     public ReservaDto updateReserva(Long id, ReservaDto reservaDto) {
-        Optional<ReservaEntity> reservaOpt = reservaRepository.findById(id);
-        if (reservaOpt.isPresent()) {
-            ReservaEntity reservaEntity = reservaOpt.get();
-            // Actualizar los campos necesarios
-            reservaEntity.setClienteId(reservaDto.getClienteId());
-            reservaEntity.setFechaReserva(reservaDto.getFechaReserva());
-            reservaEntity.setEstado(reservaDto.getEstado());
-            reservaEntity = reservaRepository.save(reservaEntity);
-            return mapper.toDto(reservaEntity, ReservaDto.class);
+        ReservaEntity reservaEntity = reservaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+
+        // Verificar si la reserva está inactiva
+        if (!reservaEntity.isActivo()) {
+            throw new NotFoundException("Reserva no encontrada o inactiva");
         }
-        throw new RuntimeException("Reserva no encontrada");
+
+        // Actualizar los campos necesarios
+        reservaEntity.setClienteId(reservaDto.getClienteId());
+        reservaEntity.setFechaReserva(reservaDto.getFechaReserva());
+        reservaEntity.setEstado(reservaDto.getEstado());
+        reservaEntity = reservaRepository.save(reservaEntity);
+        return mapper.toDto(reservaEntity, ReservaDto.class);
     }
 
     @Override
     public void deleteReserva(Long id) {
-        Optional<ReservaEntity> reservaOpt = reservaRepository.findById(id);
-        if (reservaOpt.isPresent()) {
-            ReservaEntity reservaEntity = reservaOpt.get();
-            reservaEntity.setActivo(true);  // Borrado lógico
-            reservaRepository.save(reservaEntity);
-        } else {
-            throw new RuntimeException("Reserva no encontrada");
-        }
+        ReservaEntity reservaEntity = reservaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+
+        reservaEntity.setActivo(false);
+        reservaRepository.save(reservaEntity);
     }
 
     @Override
     public ReservaDto getReservaById(Long id) {
-        return reservaRepository.findById(id)
-                .map(reserva -> mapper.toDto(reserva, ReservaDto.class))
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+        ReservaEntity reservaEntity = reservaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+
+        if (!reservaEntity.isActivo()) {
+            throw new NotFoundException("Reserva no encontrada o inactiva");
+        }
+
+        return mapper.toDto(reservaEntity, ReservaDto.class);
     }
 
     @Override
     public PageResponse<ReservaDto> getAllReservas(Pageable pageable) {
-        Page<ReservaEntity> page = reservaRepository.findAll(pageable);
-        List<ReservaDto> reservas = page.map(reserva -> mapper.toDto(reserva, ReservaDto.class)).getContent();
+        Page<ReservaEntity> page = reservaRepository.findByActivoTrue(pageable);
+        List<ReservaDto> reservas = page
+                .map(reserva -> mapper.toDto(reserva, ReservaDto.class))
+                .getContent();
+
         return new PageResponse<>(
                 reservas,
                 page.getTotalPages(),
@@ -74,4 +83,20 @@ public class ReservaServiceImpl implements IReservaService {
                 page.getNumber()
         );
     }
+
+    @Override
+    public PageResponse<ReservaDto> getReservasByEstado(String estado, Pageable pageable) {
+        Page<ReservaEntity> page = reservaRepository.findByEstadoAndActivoTrue(estado, pageable);
+        List<ReservaDto> reservas = page
+                .map(reserva -> mapper.toDto(reserva, ReservaDto.class))
+                .getContent();
+
+        return new PageResponse<>(
+                reservas,
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.getNumber()
+        );
+    }
+
 }

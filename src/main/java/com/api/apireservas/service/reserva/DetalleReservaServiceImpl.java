@@ -3,6 +3,7 @@ package com.api.apireservas.service.reserva;
 import com.api.apireservas.dto.DetalleReservaDto;
 import com.api.apireservas.dto.PageResponse;
 import com.api.apireservas.entity.DetalleReservaEntity;
+import com.api.apireservas.exceptions.NotFoundException;
 import com.api.apireservas.repository.DetalleReservaRepository;
 import com.api.apireservas.utils.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,12 @@ public class DetalleReservaServiceImpl implements IDetalleReservaService {
     @Override
     public DetalleReservaDto updateDetalleReserva(Long id, DetalleReservaDto detalleReservaDto) {
         DetalleReservaEntity detalleEntity = detalleReservaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Detalle de reserva no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Detalle de reserva no encontrado"));
+
+        if (!detalleEntity.isActivo()) {
+            throw new NotFoundException("Detalle de reserva no encontrado o inactivo");
+        }
+
         detalleEntity.setNumeroPersonas(detalleReservaDto.getNumeroPersonas());
         detalleEntity = detalleReservaRepository.save(detalleEntity);
         return mapper.toDto(detalleEntity, DetalleReservaDto.class);
@@ -40,22 +46,31 @@ public class DetalleReservaServiceImpl implements IDetalleReservaService {
     @Override
     public void deleteDetalleReserva(Long id) {
         DetalleReservaEntity detalleEntity = detalleReservaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Detalle de reserva no encontrado"));
-        detalleEntity.setActivo(true);  // Borrado lógico
+                .orElseThrow(() -> new NotFoundException("Detalle de reserva no encontrado"));
+
+        detalleEntity.setActivo(false);
         detalleReservaRepository.save(detalleEntity);
     }
 
     @Override
     public DetalleReservaDto getDetalleReservaById(Long id) {
-        return detalleReservaRepository.findById(id)
-                .map(detalle -> mapper.toDto(detalle, DetalleReservaDto.class))
-                .orElseThrow(() -> new RuntimeException("Detalle de reserva no encontrado"));
+        DetalleReservaEntity detalleEntity = detalleReservaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Detalle de reserva no encontrado"));
+
+        if (!detalleEntity.isActivo()) {
+            throw new NotFoundException("Detalle de reserva no encontrado o inactivo");
+        }
+
+        return mapper.toDto(detalleEntity, DetalleReservaDto.class);
     }
 
     @Override
     public PageResponse<DetalleReservaDto> getAllDetallesReserva(Pageable pageable) {
-        Page<DetalleReservaEntity> page = detalleReservaRepository.findAll(pageable);
-        List<DetalleReservaDto> detalles = page.map(detalle -> mapper.toDto(detalle, DetalleReservaDto.class)).getContent();
+        Page<DetalleReservaEntity> page = detalleReservaRepository.findByActivoTrue(pageable);
+        List<DetalleReservaDto> detalles = page
+                .map(detalle -> mapper.toDto(detalle, DetalleReservaDto.class))
+                .getContent();
+
         return new PageResponse<>(
                 detalles,
                 page.getTotalPages(),

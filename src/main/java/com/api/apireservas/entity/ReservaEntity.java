@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "reservas")
 public class ReservaEntity extends AbstractEntity {
 
-    private Long clienteId;  // Relación con cliente podría mejorarse
+    private Long clienteId;  // Relación con cliente
 
     @Column(name = "fecha_reserva", nullable = false)
     private LocalDateTime fechaReserva;
