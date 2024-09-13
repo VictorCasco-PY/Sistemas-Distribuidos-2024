@@ -6,6 +6,7 @@ import com.api.apireservas.entity.MesaEntity;
 import com.api.apireservas.repository.MesaRepository;
 import com.api.apireservas.utils.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,9 @@ public class MesaServiceImpl implements IMesaService {
         mesaRepository.save(mesaEntity);
     }
 
+
     @Override
+    //@Cacheable(value = "mesa", key = "'api_mesa ' + #id")
     public MesaDto getMesaById(Long id) {
         return mesaRepository.findById(id)
                 .map(mesa -> mapper.toDto(mesa, MesaDto.class))
