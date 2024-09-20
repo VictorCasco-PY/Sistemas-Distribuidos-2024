@@ -6,7 +6,6 @@ import com.api.apireservas.entity.MesaEntity;
 import com.api.apireservas.service.mesa.IMesaService;
 import com.api.apireservas.service.mesa.MesaServiceImpl;
 import com.api.apireservas.utils.Settings;
-import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +54,7 @@ public class MesaController {
         return ResponseEntity.ok(mesa);
     }
 
+    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/page/{page}")
     public ResponseEntity<PageResponse<MesaDto>> getAllMesas(
             @PathVariable("page") int page,
@@ -65,7 +65,7 @@ public class MesaController {
             size = Settings.PAGE_SIZE;
         }
 
-        Pageable pageable = PageRequest.of(page - 1, size); // La paginación empieza en 0
+        Pageable pageable = PageRequest.of(page - 1, size);
         PageResponse<MesaDto> mesas = mesaService.getAllMesas(pageable);
         return ResponseEntity.ok(mesas);
     }

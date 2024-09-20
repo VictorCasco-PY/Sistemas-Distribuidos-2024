@@ -7,6 +7,8 @@ import com.api.apireservas.exceptions.NotFoundException;
 import com.api.apireservas.repository.MesaRepository;
 import com.api.apireservas.utils.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +32,9 @@ public class MesaServiceImpl implements IMesaService {
         return mapper.toDto(mesaEntity, MesaDto.class);
     }
 
+
     @Override
+    @CachePut(value = "mesa", key = "'api_mesa_' + #id", cacheManager = "cacheManager") // TTL de 30 minutos
     public MesaDto updateMesa(Long id, MesaDto mesaDto) {
         MesaEntity mesaEntity = mesaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
@@ -40,7 +44,9 @@ public class MesaServiceImpl implements IMesaService {
         return mapper.toDto(mesaEntity, MesaDto.class);
     }
 
+
     @Override
+    @CacheEvict(value = "mesa", key = "'api_mesa_' + #id", cacheManager = "cacheManagerWithSecondsTTL")     // TTL de 60 segundos
     public void deleteMesa(Long id) {
         MesaEntity mesaEntity = mesaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
@@ -48,8 +54,9 @@ public class MesaServiceImpl implements IMesaService {
         mesaRepository.save(mesaEntity);
     }
 
+
     @Override
-    //@Cacheable(value = "mesa", key = "'api_mesa_' + #id")
+    @Cacheable(value = "mesa", key = "'api_mesa_' + #id", cacheManager = "cacheManagerWithHoursTTL") // TTL de 2 horas
     public MesaDto getMesaById(Long id) {
         MesaEntity mesaEntity = mesaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Mesa no encontrada"));
@@ -69,7 +76,7 @@ public class MesaServiceImpl implements IMesaService {
                 mesas,
                 page.getTotalPages(),
                 page.getTotalElements(),
-                page.getNumber()
+                page.getNumber() + 1
         );
     }
 }

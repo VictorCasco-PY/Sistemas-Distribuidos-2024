@@ -7,6 +7,9 @@ import com.api.apireservas.exceptions.NotFoundException;
 import com.api.apireservas.repository.DetalleReservaRepository;
 import com.api.apireservas.utils.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,7 @@ public class DetalleReservaServiceImpl implements IDetalleReservaService {
     }
 
     @Override
+    @CachePut(value = "detalleReserva", key = "'api_detalle_reserva' + #id", cacheManager = "cacheManager") // TTL de 30 minutos
     public DetalleReservaDto updateDetalleReserva(Long id, DetalleReservaDto detalleReservaDto) {
         DetalleReservaEntity detalleEntity = detalleReservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Detalle de reserva no encontrado"));
@@ -44,6 +48,7 @@ public class DetalleReservaServiceImpl implements IDetalleReservaService {
     }
 
     @Override
+    @CacheEvict(value = "detalleReserva", key = "'api_detalle_reserva_' + #id", cacheManager = "cacheManagerWithSecondsTTL")     // TTL de 60 segundos
     public void deleteDetalleReserva(Long id) {
         DetalleReservaEntity detalleEntity = detalleReservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Detalle de reserva no encontrado"));
@@ -53,6 +58,7 @@ public class DetalleReservaServiceImpl implements IDetalleReservaService {
     }
 
     @Override
+    @Cacheable(value = "detalleReserva", key = "'api_detalle_reserva' + #id", cacheManager = "cacheManagerWithHoursTTL") // TTL de 2 horas
     public DetalleReservaDto getDetalleReservaById(Long id) {
         DetalleReservaEntity detalleEntity = detalleReservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Detalle de reserva no encontrado"));

@@ -7,6 +7,9 @@ import com.api.apireservas.exceptions.NotFoundException;
 import com.api.apireservas.repository.ReservaRepository;
 import com.api.apireservas.utils.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class ReservaServiceImpl implements IReservaService {
     }
 
     @Override
+    @CachePut(value = "reserva", key = "'api_reserva_' + #id", cacheManager = "cacheManager") // TTL de 30 minutos
     public ReservaDto updateReserva(Long id, ReservaDto reservaDto) {
         ReservaEntity reservaEntity = reservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
@@ -49,6 +53,7 @@ public class ReservaServiceImpl implements IReservaService {
     }
 
     @Override
+    @CacheEvict(value = "mesa", key = "'api_reserva_' + #id", cacheManager = "cacheManagerWithSecondsTTL")     // TTL de 60 segundos
     public void deleteReserva(Long id) {
         ReservaEntity reservaEntity = reservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
@@ -58,6 +63,7 @@ public class ReservaServiceImpl implements IReservaService {
     }
 
     @Override
+    @Cacheable(value = "reserva", key = "'api_reserva_' + #id", cacheManager = "cacheManagerWithHoursTTL") // TTL de 2 horas
     public ReservaDto getReservaById(Long id) {
         ReservaEntity reservaEntity = reservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
