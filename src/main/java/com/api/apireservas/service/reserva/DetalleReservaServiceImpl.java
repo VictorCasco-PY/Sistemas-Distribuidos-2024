@@ -33,7 +33,7 @@ public class DetalleReservaServiceImpl implements IDetalleReservaService {
     }
 
     @Override
-    @CachePut(value = "detalleReserva", key = "'api_detalle_reserva' + #id", cacheManager = "cacheManager") // TTL de 30 minutos
+    @CachePut(value = "detalleReserva", key = "'api_detalle_reserva_' + #id", cacheManager = "cacheManager") // TTL de 30 minutos
     public DetalleReservaDto updateDetalleReserva(Long id, DetalleReservaDto detalleReservaDto) {
         DetalleReservaEntity detalleEntity = detalleReservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Detalle de reserva no encontrado"));
@@ -58,7 +58,7 @@ public class DetalleReservaServiceImpl implements IDetalleReservaService {
     }
 
     @Override
-    @Cacheable(value = "detalleReserva", key = "'api_detalle_reserva' + #id", cacheManager = "cacheManagerWithHoursTTL") // TTL de 2 horas
+    @Cacheable(value = "detalleReserva", key = "'api_detalle_reserva_' + #id", cacheManager = "cacheManagerWithHoursTTL") // TTL de 2 horas
     public DetalleReservaDto getDetalleReservaById(Long id) {
         DetalleReservaEntity detalleEntity = detalleReservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Detalle de reserva no encontrado"));

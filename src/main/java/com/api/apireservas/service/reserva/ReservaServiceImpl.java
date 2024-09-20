@@ -63,7 +63,7 @@ public class ReservaServiceImpl implements IReservaService {
     }
 
     @Override
-    @Cacheable(value = "reserva", key = "'api_reserva_' + #id", cacheManager = "cacheManagerWithHoursTTL") // TTL de 2 horas
+    @Cacheable(value = "reserva", key = "'api_reserva_' + #id", cacheManager = "cacheManagerNoTTL") // TTL de 2 horas
     public ReservaDto getReservaById(Long id) {
         ReservaEntity reservaEntity = reservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
