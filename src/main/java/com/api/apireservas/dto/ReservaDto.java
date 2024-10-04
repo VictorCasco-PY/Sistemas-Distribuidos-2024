@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,5 +16,5 @@ public class ReservaDto extends AbstractDto {
     private Long clienteId;
     private LocalDateTime fechaReserva;
     private String estado;
-    private boolean activo;
+    private List<DetalleReservaDto> detalles;
 }

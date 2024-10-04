@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DetalleReservaDto extends AbstractDto {
     private Long id;
-    private Long reservaId;
     private Long mesaId;
     private int numeroPersonas;
     private boolean activo;

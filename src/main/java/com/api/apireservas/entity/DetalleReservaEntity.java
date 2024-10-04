@@ -9,13 +9,22 @@ import lombok.Data;
 @Table(name = "detalle_reserva")
 public class DetalleReservaEntity extends AbstractEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "reserva_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reserva_id")
     private ReservaEntity reserva;
+
 
     @ManyToOne
     @JoinColumn(name = "mesa_id", nullable = false)
     private MesaEntity mesa;
 
     private int numeroPersonas;
+
+    public MesaEntity getMesa() {
+        return mesa;
+    }
+
+    public void setMesa(MesaEntity mesa) {
+        this.mesa = mesa;
+    }
 }

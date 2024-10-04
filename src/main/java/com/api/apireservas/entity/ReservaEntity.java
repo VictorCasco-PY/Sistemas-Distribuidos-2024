@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,4 +20,8 @@ public class ReservaEntity extends AbstractEntity {
 
     @Column(nullable = false)
     private String estado;
+
+    @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleReservaEntity> detalles;
+
 }
